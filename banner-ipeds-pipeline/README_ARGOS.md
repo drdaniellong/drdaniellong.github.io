@@ -1,3 +1,7 @@
+---
+title: Running the E1D Extracts Through Argos
+---
+
 # Running the E1D Extracts Through Argos
 
 Argos (Evisions) is a report-writer front end that sits on top of your

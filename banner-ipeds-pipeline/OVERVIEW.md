@@ -1,3 +1,7 @@
+---
+title: What This Project Is (Plain-Language Overview)
+---
+
 # What This Project Is (Plain-Language Overview)
 
 **If you're a search committee member, hiring manager, or anyone without a

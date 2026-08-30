@@ -1,3 +1,7 @@
+---
+title: IPEDS 12-Month Enrollment (E1D) — Banner SQL Extracts
+---
+
 # IPEDS 12-Month Enrollment (E1D) — Banner SQL Extracts
 
 Two SQL\*Plus / SQLcl scripts that query an Ellucian Banner (Oracle) database
