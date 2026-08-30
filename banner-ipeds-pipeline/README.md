@@ -6,10 +6,28 @@ and spool two CSV files matching the format required by
 
 https://alisonlanski.github.io/IPEDSuploadables/articles/setup_for_12monthenrollment.html
 
+New to this project? Start with the [plain-language overview](OVERVIEW.md)
+instead of this technical README.
+
 | Script | Output | Grain |
 |---|---|---|
-| `01_e1d_enrollment_extract.sql` | `e1d_enrollment.csv` | One row per student |
-| `02_e1d_instructional_activity.sql` | `e1d_instructional_activity.csv` | One row total |
+| [`01_e1d_enrollment_extract.sql`](01_e1d_enrollment_extract.sql) | `e1d_enrollment.csv` | One row per student |
+| [`02_e1d_instructional_activity.sql`](02_e1d_instructional_activity.sql) | `e1d_instructional_activity.csv` | One row total |
+
+## All files in this project
+
+| File | What it is |
+|---|---|
+| [`OVERVIEW.md`](OVERVIEW.md) | Plain-language explanation for non-technical readers |
+| [`00_code_discovery.sql`](00_code_discovery.sql) | Run first — pulls your institution's real Banner validation-table codes |
+| [`01_e1d_enrollment_extract.sql`](01_e1d_enrollment_extract.sql) | Main enrollment extract (SQL\*Plus / SQLcl version) |
+| [`02_e1d_instructional_activity.sql`](02_e1d_instructional_activity.sql) | Main instructional-activity extract (SQL\*Plus / SQLcl version) |
+| [`03_e1d_enrollment_ARGOS.sql`](03_e1d_enrollment_ARGOS.sql) | Same enrollment extract, rewritten for an Argos DataBlock |
+| [`04_e1d_instructional_activity_ARGOS.sql`](04_e1d_instructional_activity_ARGOS.sql) | Same instructional-activity extract, rewritten for an Argos DataBlock |
+| [`05_generate_test_data.sql`](05_generate_test_data.sql) | Builds a fake Banner schema + 100 test students to run everything against locally |
+| [`README_ARGOS.md`](README_ARGOS.md) | Step-by-step guide to running the extracts through Argos |
+| [`IPEDS_E1D_Test_Workflow_Summary.docx`](IPEDS_E1D_Test_Workflow_Summary.docx) | Full narrative of how this was built and tested end-to-end |
+| [`CCSU_Argos_Real_Data_QC_Plan.docx`](CCSU_Argos_Real_Data_QC_Plan.docx) | Quality-control checklist for running this against real institutional data |
 
 ## Before you run these
 
