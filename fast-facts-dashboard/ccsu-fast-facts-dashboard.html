@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCSU Central Fast Facts Dashboard</title>
+<style>
+  :root {
+    --ccsu-blue: #002f6c;
+    --ccsu-blue-dark: #001f4d;
+    --ccsu-gold: #f2a900;
+    --bg: #f4f6f9;
+    --card: #ffffff;
+    --border: #dfe4ea;
+    --text: #1c2733;
+    --muted: #5b6b7c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, Helvetica, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header {
+    background: linear-gradient(135deg, var(--ccsu-blue) 0%, var(--ccsu-blue-dark) 100%);
+    color: #fff;
+    padding: 28px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  header .title-block h1 {
+    margin: 0;
+    font-size: 1.6rem;
+    letter-spacing: 0.3px;
+  }
+  header .title-block p {
+    margin: 4px 0 0;
+    font-size: 0.9rem;
+    color: #cfd9ec;
+  }
+  header .gold-bar {
+    height: 4px;
+    background: var(--ccsu-gold);
+  }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+  }
+  .controls {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    margin-bottom: 24px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+  }
+  .field label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  select {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #fff;
+    font-size: 0.95rem;
+    color: var(--text);
+    cursor: pointer;
+  }
+  select:focus {
+    outline: 2px solid var(--ccsu-blue);
+    outline-offset: 1px;
+  }
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 10px 18px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: var(--ccsu-blue);
+    color: #fff;
+  }
+  .btn-primary:hover { background: var(--ccsu-blue-dark); }
+  .btn-secondary {
+    background: #fff;
+    color: var(--ccsu-blue);
+    border: 1px solid var(--ccsu-blue);
+  }
+  .btn-secondary:hover { background: #eef3fb; }
+  .status-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .current-doc {
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .current-doc strong {
+    color: var(--text);
+  }
+  .viewer-frame {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .viewer-frame iframe {
+    width: 100%;
+    height: 80vh;
+    border: none;
+    display: block;
+  }
+  .not-found {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--muted);
+  }
+  .not-found h2 {
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  footer a { color: var(--ccsu-blue); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="title-block">
+    <h1>Central Fast Facts Dashboard</h1>
+    <p>Central Connecticut State University &middot; Office of Institutional Research &amp; Assessment</p>
+  </div>
+</header>
+<div class="gold-bar"></div>
+
+<div class="container">
+
+  <div class="controls">
+    <div class="field">
+      <label for="yearSelect">Academic Year</label>
+      <select id="yearSelect"></select>
+    </div>
+    <div class="field">
+      <label for="semesterSelect">Semester</label>
+      <select id="semesterSelect">
+        <option value="Fall">Fall</option>
+        <option value="Spring">Spring</option>
+      </select>
+    </div>
+    <div class="actions">
+      <button class="btn btn-secondary" id="openTabBtn">Open in New Tab</button>
+      <a class="btn btn-primary" id="downloadBtn" href="#" target="_blank" rel="noopener">Download PDF</a>
+    </div>
+  </div>
+
+  <div class="status-row">
+    <div class="current-doc">Now viewing: <strong id="currentLabel">Spring 2025-26</strong></div>
+    <div class="current-doc"><a id="sourcePageLink" href="https://www.ccsu.edu/oira/central-fast-facts" target="_blank" rel="noopener">View source page &#8594;</a></div>
+  </div>
+
+  <div class="viewer-frame" id="viewerFrame">
+    <iframe id="pdfViewer" title="Fast Facts PDF Viewer"></iframe>
+  </div>
+
+</div>
+
+<footer>
+  Data sourced from <a href="https://www.ccsu.edu/oira/central-fast-facts" target="_blank" rel="noopener">ccsu.edu/oira/central-fast-facts</a>. This is an unofficial dashboard for convenience only.
+</footer>
+
+<script>
+  // Year -> { Fall: url, Spring: url }
+  const fastFacts = {
+    "2025-26": {
+      Fall:   "https://www.ccsu.edu/sites/default/files/2026-06/Fast_Facts_Fall_2025.pdf",
+      Spring: "https://www.ccsu.edu/sites/default/files/2026-04/Fast_Facts_Spring_2026-2.pdf"
+    },
+    "2024-25": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2024.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2025.pdf"
+    },
+    "2023-24": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2023.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2024.pdf"
+    },
+    "2022-23": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2022.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2023.pdf"
+    },
+    "2021-22": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2021.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2022.pdf"
+    },
+    "2020-21": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2020.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2021.pdf"
+    },
+    "2019-20": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2019.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2020.pdf"
+    },
+    "2018-19": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2018.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2019.pdf"
+    },
+    "2017-18": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2017.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2018.pdf"
+    },
+    "2016-17": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2016.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2017.pdf"
+    },
+    "2015-16": {
+      Fall:   "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2015.pdf",
+      Spring: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2016.pdf"
+    }
+  };
+
+  const yearSelect = document.getElementById('yearSelect');
+  const semesterSelect = document.getElementById('semesterSelect');
+  const pdfViewer = document.getElementById('pdfViewer');
+  const viewerFrame = document.getElementById('viewerFrame');
+  const currentLabel = document.getElementById('currentLabel');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const openTabBtn = document.getElementById('openTabBtn');
+
+  // Populate year dropdown in descending order
+  Object.keys(fastFacts).forEach(year => {
+    const opt = document.createElement('option');
+    opt.value = year;
+    opt.textContent = year;
+    yearSelect.appendChild(opt);
+  });
+
+  function updateViewer() {
+    const year = yearSelect.value;
+    const semester = semesterSelect.value;
+    const url = fastFacts[year] && fastFacts[year][semester];
+
+    currentLabel.textContent = `${semester} ${year}`;
+
+    if (url) {
+      pdfViewer.src = url;
+      downloadBtn.href = url;
+      downloadBtn.style.display = 'inline-flex';
+      viewerFrame.innerHTML = '';
+      const iframe = document.createElement('iframe');
+      iframe.id = 'pdfViewer';
+      iframe.title = 'Fast Facts PDF Viewer';
+      iframe.src = url;
+      viewerFrame.appendChild(iframe);
+    } else {
+      viewerFrame.innerHTML = `
+        <div class="not-found">
+          <h2>Not Available</h2>
+          <p>No Fast Facts PDF is published for ${semester} ${year}.</p>
+        </div>`;
+      downloadBtn.style.display = 'none';
+    }
+  }
+
+  yearSelect.addEventListener('change', updateViewer);
+  semesterSelect.addEventListener('change', updateViewer);
+
+  openTabBtn.addEventListener('click', () => {
+    const year = yearSelect.value;
+    const semester = semesterSelect.value;
+    const url = fastFacts[year] && fastFacts[year][semester];
+    if (url) window.open(url, '_blank', 'noopener');
+  });
+
+  // Set default landing page: Spring 2025-26
+  yearSelect.value = "2025-26";
+  semesterSelect.value = "Spring";
+  updateViewer();
+</script>
+
+</body>
+</html>

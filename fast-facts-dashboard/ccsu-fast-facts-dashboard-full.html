@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCSU At a Glance — Fast Facts Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root{
+    --navy: #12294b;
+    --navy-deep: #0a1a30;
+    --gold: #a9791f;
+    --gold-bright: #c99a2e;
+    --paper: #f3f2ee;
+    --paper-raised: #fbfaf7;
+    --ink: #1b2430;
+    --slate: #5c6672;
+    --line: #d8d4c9;
+    --brick: #8a3a2c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.5;
+  }
+  .serif{ font-family:'Newsreader', serif; }
+
+  /* ===== Masthead ===== */
+  .masthead{
+    background: var(--navy);
+    color: #eef1f6;
+    padding: 40px 5vw 0;
+    position: relative;
+  }
+  .masthead-top{
+    display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:10px;
+    font-size:0.78rem; letter-spacing:0.03em; color:#a9b6ca; margin-bottom:18px;
+    border-bottom: 1px solid rgba(255,255,255,0.14);
+    padding-bottom: 14px;
+  }
+  .masthead h1{
+    font-family:'Newsreader', serif;
+    font-weight:600;
+    font-size: clamp(2rem, 4.2vw, 3.2rem);
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .masthead p.dek{
+    max-width: 640px;
+    color:#c7d0dd;
+    font-size: 1.0rem;
+    margin: 0 0 26px;
+  }
+
+  /* ===== Controls bar ===== */
+  .controls-bar{
+    background: var(--navy-deep);
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding: 16px 5vw;
+    display:flex; align-items:center; gap:22px; flex-wrap:wrap;
+    position: sticky; top:0; z-index:20;
+  }
+  .controls-bar::after{
+    content:"";
+    position:absolute; left:0; right:0; bottom:-5px;
+    height:5px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold-bright) 45%, var(--navy) 45%);
+  }
+  .field-group{ display:flex; flex-direction:column; gap:5px; }
+  .field-group label{
+    font-size:0.7rem; text-transform:uppercase; letter-spacing:0.07em; color:#93a2b8;
+  }
+  select{
+    padding: 9px 34px 9px 12px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.25);
+    background: #17304f url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><path d="M0 0l5 6 5-6z" fill="%23c99a2e"/></svg>') no-repeat right 12px center;
+    color: #eef1f6;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    min-width: 150px;
+  }
+  select:focus{ outline: 2px solid var(--gold-bright); outline-offset:1px; }
+  .now-viewing{
+    margin-left: auto;
+    font-size: 0.85rem;
+    color: #c7d0dd;
+  }
+  .now-viewing strong{ color:#fff; font-family:'Newsreader',serif; font-size:1.05rem; font-weight:600; }
+  .source-link{
+    font-size: 0.78rem;
+  }
+  .source-link a{ color: var(--gold-bright); text-decoration:none; border-bottom:1px dotted var(--gold-bright); }
+
+  /* ===== Layout ===== */
+  .wrap{ max-width: 1160px; margin: 0 auto; padding: 0 5vw; }
+
+  .hero-row{
+    display:grid;
+    grid-template-columns: 1.15fr 2fr;
+    gap: 0;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+  }
+  @media (max-width: 820px){ .hero-row{ grid-template-columns: 1fr; } }
+
+  .hero-figure{
+    padding: 30px 32px 26px;
+    border-right: 1px solid var(--line);
+  }
+  @media (max-width: 820px){ .hero-figure{ border-right:none; border-bottom:1px solid var(--line);} }
+  .hero-figure .eyebrow{
+    font-size:0.72rem; text-transform:uppercase; letter-spacing:0.09em; color: var(--slate); margin-bottom:6px;
+  }
+  .hero-number{
+    font-family:'Newsreader', serif;
+    font-weight:700;
+    font-size: clamp(3rem, 5.6vw, 4.2rem);
+    color: var(--navy);
+    line-height:1;
+    margin: 4px 0 10px;
+  }
+  .hero-sub{ color: var(--slate); font-size:0.94rem; }
+  .hero-split{
+    display:flex; gap:26px; margin-top:16px; padding-top:14px; border-top:1px dashed var(--line); flex-wrap:wrap;
+  }
+  .hero-split div strong{ display:block; font-size:1.25rem; color:var(--ink); font-family:'Newsreader',serif; }
+  .hero-split div span{ font-size:0.76rem; color:var(--slate); text-transform:uppercase; letter-spacing:.04em; }
+
+  .kpi-grid{
+    display:grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+  @media (max-width: 820px){ .kpi-grid{ grid-template-columns: repeat(2,1fr);} }
+  .kpi{
+    padding: 20px 18px;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .kpi:nth-child(4n){ border-right:none; }
+  @media (max-width: 820px){ .kpi:nth-child(2n){ border-right:none; } .kpi:nth-child(4n){ border-right:1px solid var(--line);} }
+  .kpi .kpi-val{
+    font-family:'Newsreader', serif;
+    font-weight:700;
+    font-size: 1.95rem;
+    color: var(--navy);
+  }
+  .kpi .kpi-label{ font-size: 0.8rem; color: var(--slate); margin-top: 4px; }
+  .kpi .kpi-note{ font-size: 0.7rem; color: #8b93a0; margin-top: 6px; font-family:'IBM Plex Mono', monospace; }
+
+  .extra-strip{
+    display:flex; gap:0; border-top:1px solid var(--line); flex-wrap:wrap;
+  }
+  .extra-strip .kpi{ flex:1; min-width:200px; }
+
+  /* ===== Sections ===== */
+  section{ padding: 40px 0 6px; border-bottom: 1px solid var(--line); }
+  section.no-border{ border-bottom:none; }
+  .section-head{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
+    margin-bottom: 20px;
+  }
+  .section-head h2{
+    font-family:'Newsreader', serif; font-weight:600; font-size: 1.45rem; margin: 0; color: var(--navy-deep);
+  }
+  .section-head .section-note{ font-size:0.8rem; color: var(--slate); max-width:360px; text-align:right; }
+  @media (max-width:700px){ .section-head .section-note{ text-align:left; } }
+
+  .grid-2{ display:grid; grid-template-columns: 1.15fr 1fr; gap: 32px; align-items:start; }
+  @media (max-width: 900px){ .grid-2{ grid-template-columns: 1fr; } }
+
+  table{ width:100%; border-collapse: collapse; font-size: 0.9rem; }
+  thead th{
+    text-align:left; font-weight:600; color: var(--navy-deep); padding: 8px 9px;
+    border-bottom: 2px solid var(--navy); font-size: 0.8rem;
+  }
+  thead th.num, td.num{ text-align:right; }
+  tbody td{ padding: 8px 9px; border-bottom: 1px solid var(--line); color: var(--ink); }
+  tr.total-row td{
+    font-weight:600; color: var(--navy-deep); border-top: 1px solid var(--navy);
+    background: rgba(169,121,31,0.06);
+  }
+  .table-wrap{ overflow-x:auto; }
+
+  .chart-box{ background: var(--paper-raised); border: 1px solid var(--line); padding: 16px; }
+  .chart-box .chart-title{ font-size:0.76rem; text-transform:uppercase; letter-spacing:.05em; color:var(--slate); margin-bottom:10px; }
+  canvas{ max-width:100%; }
+
+  .cost-cols{ display:grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width:700px){ .cost-cols{ grid-template-columns:1fr; } }
+  .cost-list{ list-style:none; margin:0; padding:0; }
+  .cost-list li{
+    display:flex; justify-content:space-between; align-items:baseline;
+    padding: 10px 0; border-bottom: 1px dotted var(--line); font-size:0.92rem;
+  }
+  .cost-list li .amt{ font-family:'Newsreader', serif; font-weight:600; color:var(--navy); font-size:1.03rem; }
+  .cost-cols h3{
+    font-size:0.82rem; text-transform:uppercase; letter-spacing:.04em; color:var(--slate);
+    margin: 0 0 4px; padding-bottom:9px; border-bottom:1px solid var(--line);
+  }
+
+  .rank-list{ list-style:none; margin:0; padding:0; counter-reset: rank; }
+  .rank-list li{
+    counter-increment: rank; display:flex; align-items:baseline; gap:14px;
+    padding: 11px 0; border-bottom: 1px solid var(--line);
+  }
+  .rank-list li::before{
+    content: counter(rank); font-family:'Newsreader', serif; font-weight:700; color: var(--gold);
+    font-size:1.25rem; width: 24px; flex-shrink:0;
+  }
+  .rank-list li span{ font-size:0.96rem; color: var(--ink); }
+
+  .trend-note{ color:var(--slate); font-size:0.94rem; max-width:46ch; }
+  .trend-note strong{ color:var(--navy); font-size:1.1rem; }
+
+  footer{ padding: 24px 0 50px; font-size: 0.78rem; color: var(--slate); }
+  footer a{ color: var(--navy); }
+
+  .subhead-tag{
+    display:inline-block; font-size:0.72rem; text-transform:uppercase; letter-spacing:.05em;
+    color: var(--gold); border:1px solid var(--gold); border-radius:20px; padding:2px 10px; margin-bottom:8px;
+  }
+</style>
+</head>
+<body>
+
+<div class="masthead">
+  <div class="wrap">
+    <div class="masthead-top">
+      <span>Office of Institutional Research &amp; Assessment</span>
+      <span>ccsu.edu/oira</span>
+    </div>
+    <h1>Central Connecticut State University<br>At a Glance</h1>
+    <p class="dek">Enrollment, cost, degrees conferred, and faculty figures compiled from the university's official Fast Facts sheets, Fall 2019 through the present.</p>
+  </div>
+</div>
+
+<div class="controls-bar wrap" style="max-width:1160px; margin:0 auto;">
+  <div class="field-group">
+    <label for="yearSelect">Academic Year</label>
+    <select id="yearSelect"></select>
+  </div>
+  <div class="field-group">
+    <label for="semesterSelect">Semester</label>
+    <select id="semesterSelect">
+      <option value="Fall">Fall</option>
+      <option value="Spring">Spring</option>
+    </select>
+  </div>
+  <div class="now-viewing">
+    Viewing <strong id="viewingLabel">Spring 2025-26</strong>
+    <div class="source-link"><a id="sourceLink" href="#" target="_blank" rel="noopener">Open source PDF &#8594;</a></div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div style="margin-top:26px;"></div>
+
+  <div class="hero-row">
+    <div class="hero-figure">
+      <div class="eyebrow" id="censusLabel">Total Headcount</div>
+      <div class="hero-number" id="heroTotal">10,660</div>
+      <div class="hero-sub">Undergraduate and graduate students enrolled this term.</div>
+      <div class="hero-split">
+        <div><strong id="heroUG">8,925</strong><span>Undergraduate</span></div>
+        <div><strong id="heroGrad">1,735</strong><span>Graduate</span></div>
+        <div><strong id="heroGender">49% / 51%</strong><span>Male / Female</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="kpi-grid" id="kpiGrid"></div>
+      <div class="extra-strip" id="extraStrip"></div>
+    </div>
+  </div>
+
+  <!-- ENROLLMENT -->
+  <section>
+    <div class="section-head">
+      <h2>Student enrollment</h2>
+      <div class="section-note">By level, with gender, enrollment status, and residency splits.</div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Level</th><th class="num">Headcount</th><th class="num">Male</th><th class="num">Female</th>
+            <th class="num">Full-Time</th><th class="num">Part-Time</th><th class="num">Minority</th><th class="num">CT Resident</th>
+          </tr>
+        </thead>
+        <tbody id="enrollmentBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- RACE/ETHNICITY -->
+  <section>
+    <div class="section-head">
+      <h2>Students by race &amp; ethnicity</h2>
+      <div class="section-note">Undergraduate and graduate headcount by reported race/ethnicity.</div>
+    </div>
+    <div class="grid-2">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Race / Ethnicity</th><th class="num">Undergrad</th><th class="num">Graduate</th><th class="num">Total</th></tr></thead>
+          <tbody id="raceBody"></tbody>
+        </table>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Total headcount by group</div>
+        <canvas id="raceChart" height="290"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- MINORITY TREND -->
+  <section>
+    <div class="section-head">
+      <h2>Minority enrollment, ten-year change</h2>
+      <div class="section-note">Share of total headcount identifying as a minority group.</div>
+    </div>
+    <div class="grid-2">
+      <div class="chart-box">
+        <div class="chart-title" id="minorityChartTitle">Minority percentage</div>
+        <canvas id="minorityChart" height="230"></canvas>
+      </div>
+      <div>
+        <p class="trend-note" id="minorityNote"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COST -->
+  <section>
+    <div class="section-head">
+      <h2>Cost of attendance</h2>
+      <div class="section-note" id="costNote">Full-time annual tuition &amp; fees and part-time per-credit rates.</div>
+    </div>
+    <div class="cost-cols">
+      <div>
+        <h3>Full-Time — Per Year</h3>
+        <ul class="cost-list" id="costFullTime"></ul>
+      </div>
+      <div>
+        <h3 id="costPartTimeHeader">Part-Time, In-State — Per Credit Hour</h3>
+        <ul class="cost-list" id="costPartTime"></ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEGREES AWARDED -->
+  <section>
+    <div class="section-head">
+      <h2>Degrees awarded</h2>
+      <div class="section-note" id="degreesNote">By school and credential level.</div>
+    </div>
+    <div class="grid-2">
+      <div class="table-wrap">
+        <table>
+          <thead><tr id="degreesHeadRow"><th>Credential</th></tr></thead>
+          <tbody id="degreesBody"></tbody>
+        </table>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">Degrees by school</div>
+        <canvas id="degreesChart" height="290"></canvas>
+      </div>
+    </div>
+  </section>
+
+  <!-- FACULTY + POPULAR PROGRAMS -->
+  <section class="no-border">
+    <div class="section-head">
+      <h2>Faculty &amp; popular programs</h2>
+      <div class="section-note" id="facultyNote">AAUP faculty headcount; most popular undergraduate majors.</div>
+    </div>
+    <div class="grid-2">
+      <div class="chart-box">
+        <div class="chart-title" id="facultyChartTitle">Faculty composition</div>
+        <canvas id="facultyChart" height="230"></canvas>
+      </div>
+      <div>
+        <h3 style="font-size:0.82rem; text-transform:uppercase; letter-spacing:.04em; color:var(--slate); margin:0 0 4px; padding-bottom:9px; border-bottom:1px solid var(--line);">Most Popular Undergraduate Degree Programs</h3>
+        <ol class="rank-list" id="popularList"></ol>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Source: Central Connecticut State University Office of Institutional Research &amp; Assessment,
+    <a href="https://www.ccsu.edu/oira/central-fast-facts" target="_blank" rel="noopener">Fast Facts archive</a>.
+    Figures as published in each semester's PDF; this page is an unofficial visualization for reference only.
+    Where a source PDF left a field blank or a figure appeared inconsistent across years, it is shown as published.
+  </footer>
+</div>
+
+<script>
+/* =========================================================
+   DATA — extracted from each semester's Fast Facts PDF
+   ========================================================= */
+const DATA = {
+"2025-26": { Fall: {
+  pdf: "https://www.ccsu.edu/sites/default/files/2026-06/Fast_Facts_Fall_2025.pdf",
+  census: "Fall 2025 Census",
+  headcount: { ug:{n:9463,m:51,f:49,ft:76,pt:24,min:49,ctres:94}, grad:{n:1802,m:38,f:62,ft:35,pt:65,min:34,ctres:92}, total:{n:11265,m:49,f:51,ft:70,pt:30,min:46,ctres:94} },
+  cost:{ span:"2025-2026", format:"new",
+    fullTime:[["In-State Undergraduate","$13,050"],["Domestic/NEBHE Undergraduate","$16,550"],["International Undergraduate","$26,990"],["In-State Graduate","$14,562"],["National Resident Graduate","$18,920"],["International Graduate","$28,292"]],
+    partTime:[["Undergraduate","$642"],["Graduate","$809"],["Doctoral","$1,109"]] },
+  race:[["White",4478,1110,5588],["Hispanic/Latino",2262,274,2536],["Black or African American",1533,205,1738],["Asian",465,69,534],["Two or More Races",336,55,391],["Race and Ethnicity Unknown",210,43,253],["U.S. Non-Resident",164,41,205],["American Indian/Alaska Native",12,3,15],["Native Hawaiian or Other Pacific Islander",3,2,5]],
+  raceTotal:[9463,1802,11265],
+  degrees:{ span:"July 1, 2024-June 30, 2025", schools:["Liberal Arts & Social Sciences","Business","Education","Eng., Sci. & Tech.","Health & Rehab. Sci."],
+    rows:[["Bachelor's",[578,318,65,455,155],1571],["Master's",[86,107,67,117,88],465],["Post-Bac. Cert.",[18,28,2,36,4],88],["Post-Master's Cert.",[0,0,107,0,14],121],["Doctoral",[0,0,19,0,32],51],["Post-Secondary",[21,2,0,0,0],23]],
+    total:[703,455,260,608,293], totalAll:2319 },
+  faculty:{ ft:418, pt:514, total:932, label:"AAUP Faculty (Fall 2025)" },
+  kpis:{ retention:{pct:76, span:"Fall 2024 to Fall 2025"}, gradRate:{pct:48, cohort:"6 Yr. (Fall 2018 Cohort)", source:"IPEDS 2025"}, ratio:"14:1", tenureTrack:{pct:93, source:"AAUP Faculty, Fall 2025"} },
+  minorityTrend:{ labelA:"FA2015", pctA:29, labelB:"FA2025", pctB:46 },
+  popularPrograms:["Business/Marketing","Computer Info. Science","Social Sciences","Health Profession/Science","Psychology"],
+  extra:{ pell:"49%", firstGen:"46%" }
+},
+Spring: {
+  pdf: "https://www.ccsu.edu/sites/default/files/2026-04/Fast_Facts_Spring_2026-2.pdf",
+  census: "Spring 2026 Census",
+  headcount: { ug:{n:8925,m:51,f:49,ft:74,pt:26,min:49,ctres:94}, grad:{n:1735,m:38,f:62,ft:33,pt:67,min:33,ctres:93}, total:{n:10660,m:49,f:51,ft:67,pt:33,min:46,ctres:94} },
+  cost:{ span:"2025-2026", format:"new",
+    fullTime:[["In-State Undergraduate","$13,050"],["Domestic/NEBHE Undergraduate","$16,550"],["International Undergraduate","$26,990"],["In-State Graduate","$14,562"],["National Resident Graduate","$18,920"],["International Graduate","$28,292"]],
+    partTime:[["Undergraduate","$642"],["Graduate","$809"],["Doctoral","$1,109"]] },
+  race:[["White",4181,1073,5254],["Hispanic/Latino",2083,278,2361],["Black or African American",1418,177,1595],["Asian",494,79,573],["Two or More Races",342,41,383],["Race and Ethnicity Unknown",238,44,282],["U.S. Non-Resident",154,40,194],["American Indian/Alaska Native",13,2,15],["Native Hawaiian or Other Pacific Islander",2,1,3]],
+  raceTotal:[8925,1735,10660],
+  degrees:{ span:"July 1, 2024-June 30, 2025", schools:["Liberal Arts & Social Sciences","Business","Education","Eng., Sci. & Tech.","Health & Rehab. Sci."],
+    rows:[["Bachelor's",[578,318,65,455,155],1571],["Master's",[86,107,67,117,88],465],["Post-Bac. Cert.",[18,28,2,36,4],88],["Post-Master's Cert.",[0,0,107,0,14],121],["Doctoral",[0,0,19,0,32],51],["Post-Secondary",[21,2,0,0,0],23]],
+    total:[703,455,260,608,293], totalAll:2319 },
+  faculty:{ ft:420, pt:529, total:949, label:"AAUP Faculty (Spring 2026)" },
+  kpis:{ retention:{pct:76, span:"Fall 2024 to Fall 2025"}, gradRate:{pct:48, cohort:"6 Yr. (Fall 2018 Cohort)", source:"IPEDS 2025"}, ratio:"14:1", tenureTrack:{pct:93, source:"AAUP Faculty, Spring 2026"} },
+  minorityTrend:{ labelA:"SP2016", pctA:29, labelB:"SP2026", pctB:46 },
+  popularPrograms:["Business/Marketing","Computer Info. Science","Social Sciences","Health Profession/Science","Psychology"]
+}},
+
+"2024-25": { Fall: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2024.pdf",
+  census: "Fall 2024 Census",
+  headcount: { ug:{n:8170,m:54,f:46,ft:80,pt:20,min:44,ctres:94}, grad:{n:1827,m:38,f:62,ft:34,pt:66,min:33,ctres:91}, total:{n:9997,m:51,f:49,ft:72,pt:28,min:42,ctres:94} },
+  cost:{ span:"2024-2025", format:"new",
+    fullTime:[["In-State Undergraduate","$13,050"],["Domestic/NEBHE Undergraduate","$16,550"],["International Undergraduate","$26,990"],["In-State Graduate","$14,562"],["National Resident Graduate","$18,920"],["International Graduate","$28,290"]],
+    partTime:[["Undergraduate","$642"],["Graduate","$809"],["Doctoral","$1,109"]] },
+  race:[["White",4211,1149,5360],["Hispanic/Latino",1731,271,2002],["Black or African American",1219,202,1421],["Asian",415,71,486],["Two or More Races",224,52,276],["Race and Ethnicity Unknown",196,35,231],["U.S. Non-Resident",155,41,196],["American Indian/Alaska Native",15,4,19],["Native Hawaiian or Other Pacific Islander",4,2,6]],
+  raceTotal:[8170,1827,9997],
+  degrees:{ span:"July 1, 2023-June 30, 2024", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[552,321,236,407],1516],["Master's",[91,101,134,70],396],["Post-Bac. Cert.",[13,21,7,15],56],["Post-Master's Cert.",[0,0,147,0],147],["Doctoral",[0,0,11,26],37],["Post-Secondary",[7,0,0,0],7]],
+    total:[663,443,535,518], totalAll:2159 },
+  faculty:{ ft:411, pt:479, total:890, label:"AAUP Faculty (Fall 2024)" },
+  kpis:{ retention:{pct:77, span:"Fall 2023 to Fall 2024"}, gradRate:{pct:49, cohort:"6 Yr. (Fall 2017 Cohort)", source:"IPEDS 2024"}, ratio:"14:1", tenureTrack:{pct:94, source:"AAUP Faculty, Fall 2024"} },
+  minorityTrend:{ labelA:"FA2014", pctA:28, labelB:"FA2024", pctB:42 },
+  popularPrograms:["Business/Marketing","Computer Info. Science","Social Sciences","Education","Psychology"]
+},
+Spring: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2025.pdf",
+  census: "Spring 2025 Census",
+  headcount: { ug:{n:8287,m:52,f:48,ft:73,pt:27,min:45,ctres:95}, grad:{n:1752,m:38,f:62,ft:30,pt:70,min:33,ctres:91}, total:{n:10039,m:50,f:50,ft:65,pt:35,min:43,ctres:94} },
+  cost:{ span:"2024-2025", format:"new",
+    fullTime:[["In-State Undergraduate","$13,050"],["Domestic/NEBHE Undergraduate","$16,550"],["International Undergraduate","$26,990"],["In-State Graduate","$14,562"],["National Resident Graduate","$18,920"],["International Graduate","$28,290"]],
+    partTime:[["Undergraduate","$642"],["Graduate","$809"],["Doctoral","$1,109"]] },
+  race:[["White",4215,1104,5319],["Hispanic/Latino",1816,259,2075],["Black or African American",1263,190,1453],["Asian",400,64,464],["Two or More Races",248,53,301],["Race and Ethnicity Unknown",190,34,224],["U.S. Non-Resident",144,39,183],["American Indian/Alaska Native",8,6,14],["Native Hawaiian or Other Pacific Islander",3,3,6]],
+  raceTotal:[8287,1752,10039],
+  degrees:{ span:"July 1, 2023-June 30, 2024", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[552,321,236,407],1516],["Master's",[91,101,134,70],396],["Post-Bac. Cert.",[13,21,7,15],56],["Post-Master's Cert.",[0,0,147,0],147],["Doctoral",[0,0,11,26],37],["Post-Secondary",[7,0,0,0],7]],
+    total:[663,443,535,518], totalAll:2159 },
+  faculty:{ ft:408, pt:481, total:889, label:"AAUP Faculty (Spring 2025)" },
+  kpis:{ retention:{pct:77, span:"Fall 2023 to Fall 2024"}, gradRate:{pct:49, cohort:"6 Yr. (Fall 2017 Cohort)", source:"IPEDS 2024"}, ratio:"14:1", tenureTrack:{pct:93, source:"AAUP Faculty, Spring 2025"} },
+  minorityTrend:{ labelA:"SP2015", pctA:28, labelB:"SP2025", pctB:43 },
+  popularPrograms:["Business/Marketing","Computer Info. Science","Social Sciences","Education","Psychology"]
+}},
+
+"2023-24": { Fall: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2023.pdf",
+  census: "Fall 2023 Census",
+  headcount: { ug:{n:7917,m:54,f:46,ft:81,pt:19,min:42,ctres:94}, grad:{n:1795,m:37,f:63,ft:29,pt:71,min:30,ctres:92}, total:{n:9712,m:51,f:49,ft:71,pt:29,min:40,ctres:94} },
+  cost:{ span:"2023-2024", format:"old",
+    fullTime:[["In-State Undergraduate","$12,460"],["Out-of-State Undergraduate","$25,736"],["In-State Graduate","$13,890"],["Out-of-State Graduate","$26,970"]],
+    partTime:[["Undergraduate","$612"],["Graduate","$771"],["Doctoral","$1,058"]] },
+  race:[["White",4269,1179,5448],["Hispanic/Latino",1590,251,1841],["Black or African American",1062,166,1228],["Asian",400,72,472],["Two or More Races",236,55,291],["Race and Ethnicity Unknown",198,39,237],["U.S. Non-Resident",150,33,183],["American Indian/Alaska Native",9,0,9],["Native Hawaiian or Other Pacific Islander",3,0,3]],
+  raceTotal:[7917,1795,9712],
+  degrees:{ span:"July 1, 2022-June 30, 2023", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[645,360,289,484],1778],["Master's",[85,120,172,76],453],["Post-Bac. Cert.",[6,26,16,17],65],["Post-Master's Cert.",[0,0,120,0],120],["Doctoral",[0,0,16,25],41],["Post-Secondary",[4,0,0,0],4]],
+    total:[740,506,613,602], totalAll:2461 },
+  faculty:{ ft:409, pt:458, total:867, label:"AAUP Faculty (Fall 2023)" },
+  kpis:{ retention:{pct:79, span:"Fall 2022 to Fall 2023"}, gradRate:{pct:53, cohort:"6 Yr. (Fall 2016 Cohort)", source:"IPEDS 2023"}, ratio:"14:1", tenureTrack:{pct:93, source:"AAUP Faculty, Fall 2023"} },
+  minorityTrend:{ labelA:"FA2013", pctA:26, labelB:"FA2023", pctB:40 },
+  popularPrograms:["Computer/Info. Science","Business/Marketing","Education","Psychology","Social Sciences"]
+},
+Spring: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2024.pdf",
+  census: "Spring 2024 Census",
+  headcount: { ug:{n:7496,m:53,f:47,ft:77,pt:23,min:42,ctres:95}, grad:{n:1770,m:37,f:63,ft:24,pt:76,min:31,ctres:92}, total:{n:9266,m:50,f:50,ft:67,pt:33,min:40,ctres:94} },
+  cost:{ span:"2023-2024", format:"old",
+    fullTime:[["In-State Undergraduate","$12,460"],["Out-of-State Undergraduate","$25,736"],["In-State Graduate","$13,890"],["Out-of-State Graduate","$26,970"]],
+    partTime:[["Undergraduate","$612"],["Graduate","$771"],["Doctoral","$1,058"]] },
+  race:[["White",4008,1150,5158],["Hispanic/Latino",1537,243,1780],["Black or African American",1026,179,1205],["Asian",374,75,449],["Two or More Races",229,58,287],["Race and Ethnicity Unknown",168,29,197],["U.S. Non-Resident",142,36,178],["American Indian/Alaska Native",8,0,8],["Native Hawaiian or Other Pacific Islander",4,0,4]],
+  raceTotal:[7496,1770,9266],
+  degrees:{ span:"July 1, 2022-June 30, 2023", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[645,360,289,484],1778],["Master's",[85,120,172,76],453],["Post-Bac. Cert.",[6,26,16,17],65],["Post-Master's Cert.",[0,0,120,0],120],["Doctoral",[0,0,16,25],41],["Post-Secondary",[4,0,0,0],4]],
+    total:[740,506,613,602], totalAll:2461 },
+  faculty:{ ft:407, pt:461, total:868, label:"AAUP Faculty (Spring 2024)" },
+  kpis:{ retention:{pct:79, span:"Fall 2022 to Fall 2023"}, gradRate:{pct:53, cohort:"6 Yr. (Fall 2016 Cohort)", source:"IPEDS 2023"}, ratio:"14:1", tenureTrack:{pct:93, source:"AAUP Faculty, Spring 2024"} },
+  minorityTrend:{ labelA:"SP2014", pctA:27, labelB:"SP2024", pctB:40 },
+  popularPrograms:["Computer/Info. Science","Business/Marketing","Education","Psychology","Social Sciences"]
+}},
+
+"2022-23": { Fall: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2022.pdf",
+  census: "Fall 2022 Census",
+  headcount: { ug:{n:7665,m:55,f:45,ft:79,pt:21,min:40,ctres:95}, grad:{n:1803,m:36,f:64,ft:26,pt:74,min:30,ctres:92}, total:{n:9468,m:51,f:49,ft:69,pt:31,min:38,ctres:95} },
+  cost:{ span:"2022-2023", format:"old",
+    fullTime:[["In-State Undergraduate","$12,106"],["Out-of-State Undergraduate","$24,994"],["In-State Graduate","$13,488"],["Out-of-State Graduate","$26,186"]],
+    partTime:[["Undergraduate","$595"],["Graduate","$749"],["Doctoral","$1,027"]] },
+  race:[["White",4294,1220,5514],["Hispanic/Latino",1373,229,1602],["Black or African American",1012,162,1174],["Asian",405,86,491],["Two or More Races",265,54,319],["Race and Ethnicity Unknown",162,23,185],["U.S. Non-Resident",140,26,166],["American Indian/Alaska Native",8,1,9],["Native Hawaiian or Other Pacific Islander",6,2,8]],
+  raceTotal:[7665,1803,9468],
+  degrees:{ span:"July 1, 2021-June 30, 2022", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[578,336,249,461],1624],["Master's",[84,115,217,76],492],["Post-Bac. Cert.",[3,1,7,19],30],["Post-Master's Cert.",[0,0,111,0],111],["Doctoral",[0,0,14,29],43],["Post-Secondary",[2,0,0,0],2]],
+    total:[667,452,598,585], totalAll:2302 },
+  faculty:{ ft:392, pt:438, total:830, label:"AAUP Faculty (Fall 2022)" },
+  kpis:{ retention:{pct:77, span:"Fall 2021 to Fall 2022"}, gradRate:{pct:55, cohort:"6 Yr. (2015 Cohort)", source:null}, ratio:"14:1", tenureTrack:{pct:94, source:"AAUP Faculty, Fall 2022"} },
+  minorityTrend:{ labelA:"2012", pctA:24, labelB:"2022", pctB:38 },
+  popularPrograms:["Computer/Info. Science","Business/Marketing","Education","Psychology","Social Sciences"]
+},
+Spring: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2023.pdf",
+  census: "Spring 2023 Census",
+  headcount: { ug:{n:7123,m:54,f:46,ft:76,pt:24,min:40,ctres:95}, grad:{n:1768,m:36,f:64,ft:24,pt:76,min:29,ctres:93}, total:{n:8891,m:51,f:49,ft:66,pt:34,min:38,ctres:95} },
+  cost:{ span:"2022-2023", format:"old",
+    fullTime:[["In-State Undergraduate","$12,106"],["Out-of-State Undergraduate","$24,994"],["In-State Graduate","$13,488"],["Out-of-State Graduate","$26,186"]],
+    partTime:[["Undergraduate","$595"],["Graduate","$749"],["Doctoral","$1,027"]] },
+  race:[["White",3971,1208,5179],["Hispanic/Latino",1310,226,1536],["Black or African American",935,158,1093],["Asian",373,73,446],["Two or More Races",250,50,300],["Race and Ethnicity Unknown",147,27,174],["U.S. Non-Resident",125,26,151],["American Indian/Alaska Native",8,0,8],["Native Hawaiian or Other Pacific Islander",4,0,4]],
+  raceTotal:[7123,1768,8891],
+  degrees:{ span:"July 1, 2021-June 30, 2022", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[578,336,249,461],1624],["Master's",[84,115,217,76],492],["Post-Bac. Cert.",[3,1,7,19],30],["Post-Master's Cert.",[0,0,111,0],111],["Doctoral",[0,0,14,29],43],["Post-Secondary",[2,0,0,0],2]],
+    total:[667,452,598,585], totalAll:2302 },
+  faculty:{ ft:395, pt:436, total:831, label:"AAUP Faculty (Spring 2023)" },
+  kpis:{ retention:{pct:77, span:"Fall 2021 to Fall 2022"}, gradRate:{pct:55, cohort:"6 Yr. (Fall 2015 Cohort)", source:"Fall 2022"}, ratio:"14:1", tenureTrack:{pct:92, source:"AAUP Faculty, Spring 2023"} },
+  minorityTrend:{ labelA:"SP2013", pctA:24, labelB:"SP2023", pctB:38 },
+  popularPrograms:["Computer/Info. Science","Business/Marketing","Education","Psychology","Social Sciences"]
+}},
+
+"2021-22": { Fall: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2021.pdf",
+  census: "Fall 2021 Census",
+  headcount: { ug:{n:7748,m:54,f:46,ft:78,pt:22,min:38,ctres:96}, grad:{n:1905,m:36,f:64,ft:25,pt:75,min:28,ctres:94}, total:{n:9653,m:50,f:50,ft:68,pt:32,min:36,ctres:95} },
+  cost:{ span:"2021-2022", format:"old",
+    fullTime:[["In-State Undergraduate","$11,542"],["Out-of-State Undergraduate","$24,946"],["In-State Graduate","$12,848"],["Out-of-State Graduate","$26,072"]],
+    partTime:[["Undergraduate","$567"],["Graduate","$714"],["Doctoral","$979"]] },
+  race:[["White",4423,1322,5745],["Hispanic/Latino",1316,228,1544],["Black or African American",992,167,1159],["Asian",371,87,458],["Two or More Races",285,45,330],["Race and Ethnicity Unknown",217,30,247],["Non-Resident Alien",133,23,156],["American Indian/Alaska Native",5,2,7],["Native Hawaiian or Other Pacific Islander",6,1,7]],
+  raceTotal:[7748,1905,9653],
+  degrees:{ span:"July 1, 2020-June 30, 2021", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[604,410,325,499],1838],["Master's",[83,127,204,97],511],["Post-Bac. Cert.",[4,7,13,19],43],["Post-Master's Cert.",[0,0,129,0],129],["Doctoral",[0,0,15,23],38]],
+    total:[691,544,686,638], totalAll:2559 },
+  faculty:{ ft:416, pt:432, total:848, label:"Faculty (Fall 2021)" },
+  kpis:{ retention:{pct:72, span:"Fall 2020 to Fall 2021"}, gradRate:{pct:52, cohort:"6 Yr. (2014 Cohort)", source:null}, ratio:"14:1", tenureTrack:{pct:95, source:"Faculty, Fall 2021"} },
+  minorityTrend:{ labelA:"2011", pctA:22, labelB:"2021", pctB:36 },
+  popularPrograms:["Computer/Info. Science","Business/Marketing","Education","Psychology","Social Sciences"]
+},
+Spring: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2022.pdf",
+  census: "Spring 2022 Census",
+  headcount: { ug:{n:7054,m:54,f:46,ft:77,pt:23,min:39,ctres:96}, grad:{n:1844,m:36,f:64,ft:25,pt:75,min:29,ctres:94}, total:{n:8898,m:50,f:50,ft:66,pt:34,min:37,ctres:95} },
+  cost:{ span:"2021-2022", format:"old",
+    fullTime:[["In-State Undergraduate","$11,542"],["Out-of-State Undergraduate","$24,946"],["In-State Graduate","$12,848"],["Out-of-State Graduate","$26,072"]],
+    partTime:[["Undergraduate","$567"],["Graduate","$714"],["Doctoral","$979"]] },
+  race:[["White",4006,1267,5273],["Hispanic/Latino",1240,227,1467],["Black or African American",890,158,1048],["Asian",345,95,440],["Two or More Races",250,48,298],["Race and Ethnicity Unknown",191,27,218],["Non-Resident Alien",120,20,140],["American Indian/Alaska Native",6,1,7],["Native Hawaiian or Other Pacific Islander",6,1,7]],
+  raceTotal:[7054,1844,8898],
+  degrees:{ span:"July 1, 2020-June 30, 2021", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[604,410,325,499],1838],["Master's",[83,127,204,97],511],["Post-Bac. Cert.",[4,7,13,19],43],["Post-Master's Cert.",[0,0,129,0],129],["Doctoral",[0,0,15,23],38]],
+    total:[691,544,686,638], totalAll:2559 },
+  faculty:{ ft:408, pt:430, total:838, label:"Faculty (Spring 2022)" },
+  kpis:{ retention:{pct:72, span:"Fall 2020 to Fall 2021"}, gradRate:{pct:55, cohort:"6 Yr. (2015 Cohort)", source:null}, ratio:"14:1", tenureTrack:{pct:94, source:"Faculty, Spring 2022"} },
+  minorityTrend:{ labelA:"2011", pctA:22, labelB:"2021", pctB:36 },
+  popularPrograms:["Computer/Info. Science","Business","Education","Psychology","Social Sciences"]
+}},
+
+"2020-21": { Fall: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2020.pdf",
+  census: "Fall 2020 Census",
+  headcount: { ug:{n:8593,m:53,f:47,ft:79,pt:21,min:38,ctres:96}, grad:{n:2059,m:35,f:65,ft:26,pt:74,min:27,ctres:95}, total:{n:10652,m:50,f:50,ft:69,pt:31,min:35,ctres:96} },
+  cost:{ span:"2020-2021", format:"old",
+    fullTime:[["In-State Undergraduate","$11,502"],["Out-of-State Undergraduate","$24,906"],["In-State Graduate","$12,848"],["Out-of-State Graduate","$26,072"]],
+    partTime:[["Undergraduate","$567"],["Graduate","$714"],["Doctoral","$979"]] },
+  race:[["White",4976,1437,6413],["Hispanic/Latino",1425,252,1677],["Black or African American",1090,170,1260],["Asian",401,86,487],["Two or More Races",289,46,335],["Race and Ethnicity Unknown",271,30,301],["Non-Resident Alien",123,35,158],["American Indian/Alaska Native",10,1,11],["Native Hawaiian or Other Pacific Islander",8,2,10]],
+  raceTotal:[8593,2059,10652],
+  degrees:{ span:"July 1, 2019-June 30, 2020", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[657,438,277,500],1872],["Master's",[93,108,237,116],554],["Post-Bac. Cert.",[3,6,9,11],29],["Post-Master's Cert.",[0,0,116,5],121],["Doctoral",[0,0,9,21],30]],
+    total:[753,552,648,653], totalAll:2606 },
+  faculty:{ ft:428, pt:472, total:900, label:"Faculty (Fall 2020)" },
+  kpis:{ retention:{pct:78, span:"Fall 2019 to Fall 2020"}, gradRate:{pct:57, cohort:"6 Yr. (2013 Cohort)", source:null}, ratio:"14:1", tenureTrack:{pct:97, source:"Faculty, Fall 2020"} },
+  minorityTrend:{ labelA:"2010", pctA:21, labelB:"2020", pctB:35 },
+  popularPrograms:["Computer/Info. Science","Business/Marketing","Education","Psychology","Social Sciences"]
+},
+Spring: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2021.pdf",
+  census: "Spring 2021 Census",
+  headcount: { ug:{n:7636,m:53,f:47,ft:76,pt:24,min:37,ctres:96}, grad:{n:1993,m:35,f:65,ft:25,pt:75,min:27,ctres:96}, total:{n:9629,m:49,f:51,ft:65,pt:35,min:35,ctres:96} },
+  cost:{ span:"2020-2021", format:"old",
+    fullTime:[["In-State Undergraduate","$11,502"],["Out-of-State Undergraduate","$24,906"],["In-State Graduate","$12,848"],["Out-of-State Graduate","$26,072"]],
+    partTime:[["Undergraduate","$567"],["Graduate","$714"],["Doctoral","$979"]] },
+  race:[["White",4452,1396,5848],["Hispanic/Latino",1266,240,1506],["Black or African American",915,178,1093],["Asian",357,86,443],["Two or More Races",269,37,306],["Race and Ethnicity Unknown",256,24,280],["Non-Resident Alien",106,28,134],["American Indian/Alaska Native",10,2,12],["Native Hawaiian or Other Pacific Islander",5,2,7]],
+  raceTotal:[7636,1993,9629],
+  degrees:{ span:"July 1, 2019-June 30, 2020", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[657,438,277,500],1872],["Master's",[93,108,237,116],554],["Post-Bac. Cert.",[3,6,9,11],29],["Post-Master's Cert.",[0,0,116,5],121],["Doctoral",[0,0,9,21],30]],
+    total:[753,552,648,653], totalAll:2606 },
+  faculty:{ ft:420, pt:414, total:834, label:"Faculty (Spring 2021)" },
+  kpis:{ retention:{pct:78, span:"Fall 2019 to Fall 2020"}, gradRate:{pct:52, cohort:"6 Yr. (2014 Cohort)", source:null}, ratio:"14:1", tenureTrack:{pct:97, source:"Faculty, Spring 2021"} },
+  minorityTrend:{ labelA:"SP2011", pctA:21, labelB:"SP2021", pctB:35 },
+  popularPrograms:["Computer/Info. Science","Business/Marketing","Education","Psychology","Social Sciences"]
+}},
+
+"2019-20": { Fall: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Fall_2019.pdf",
+  census: "Fall 2019 Census",
+  headcount: { ug:{n:9045,m:53,f:47,ft:80,pt:20,min:37,ctres:96}, grad:{n:2109,m:35,f:65,ft:24,pt:76,min:27,ctres:95}, total:{n:11154,m:50,f:50,ft:70,pt:30,min:35,ctres:96} },
+  cost:{ span:"2019-2020", format:"old",
+    fullTime:[["In-State Undergraduate","$11,068"],["Out-of-State Undergraduate","$24,028"],["In-State Graduate","$12,356"],["Out-of-State Graduate","$25,144"]],
+    partTime:[["Undergraduate","$545"],["Graduate","$686"],["Doctoral","$941"]] },
+  race:[["White",5291,1463,6754],["Hispanic/Latino",1452,248,1700],["Black or African American",1132,183,1315],["Asian",395,83,478],["Two or More Races",309,54,363],["Race and Ethnicity Unknown",308,36,344],["Non-Resident Alien",142,37,179],["American Indian/Alaska Native",8,2,10],["Native Hawaiian or Other Pacific Islander",8,3,11]],
+  raceTotal:[9045,2109,11154],
+  degrees:{ span:"July 1, 2018-June 30, 2019", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[724,504,315,464],2007],["Master's",[92,89,272,161],614],["Post-Bac. Cert.",[3,5,33,11],52],["Post-Master's Cert.",[0,0,137,1],138],["Doctoral",[0,0,5,5],10]],
+    total:[819,598,762,642], totalAll:2821 },
+  faculty:{ ft:440, pt:541, total:981, label:"Faculty (Fall 2019)" },
+  kpis:{ retention:{pct:72, span:"Fall 2018 to Fall 2019"}, gradRate:{pct:51, cohort:"6 Yr. (2012 Cohort)", source:null}, ratio:"14:1", tenureTrack:{pct:95, source:"Faculty, Fall 2019"} },
+  minorityTrend:{ labelA:"2010", pctA:21, labelB:"2019", pctB:35 },
+  popularPrograms:["Biological/Life Sciences","Business/Marketing","Education","Psychology","Social Sciences"]
+},
+Spring: {
+  pdf: "https://docs.ccsu.edu/oira/institutionalData/fastfacts/Fast_Facts_Spring_2020.pdf",
+  census: "Spring 2020 Census",
+  headcount: { ug:{n:8241,m:53,f:47,ft:79,pt:21,min:36,ctres:96}, grad:{n:2021,m:35,f:65,ft:22,pt:78,min:27,ctres:95}, total:{n:10262,m:49,f:51,ft:67,pt:33,min:34,ctres:96} },
+  cost:{ span:"2019-2020", format:"old",
+    fullTime:[["In-State Undergraduate","$11,068"],["Out-of-State Undergraduate","$24,028"],["In-State Graduate","$12,356"],["Out-of-State Graduate","$25,144"]],
+    partTime:[["Undergraduate","$545"],["Graduate","$686"],["Doctoral","$941"]] },
+  race:[["White",4849,1405,6254],["Hispanic/Latino",1304,229,1533],["Black or African American",1007,184,1191],["Asian",377,80,457],["Two or More Races",278,48,326],["Race and Ethnicity Unknown",272,31,303],["Non-Resident Alien",137,38,175],["American Indian/Alaska Native",9,3,12],["Native Hawaiian or Other Pacific Islander",8,3,11]],
+  raceTotal:[8241,2021,10262],
+  degrees:{ span:"July 1, 2018-June 30, 2019", schools:["Liberal Arts & Social Sciences","Business","Education & Professional Studies","Eng., Sci. & Tech."],
+    rows:[["Bachelor's",[724,504,315,464],2007],["Master's",[92,89,272,161],614],["Post-Bac. Cert.",[3,5,33,11],52],["Post-Master's Cert.",[0,0,137,1],138],["Doctoral",[0,0,5,5],10]],
+    total:[819,598,762,642], totalAll:2821 },
+  faculty:{ ft:435, pt:504, total:939, label:"Faculty (Spring 2020)" },
+  kpis:{ retention:{pct:72, span:"Fall 2018 to Fall 2019"}, gradRate:{pct:57, cohort:"6 Yr. (2013 Cohort)", source:null}, ratio:"14:1", tenureTrack:{pct:95, source:"Faculty, Spring 2020"} },
+  minorityTrend:{ labelA:"2010", pctA:21, labelB:"2020", pctB:34 },
+  popularPrograms:["Biological/Life Sciences","Business/Marketing","Education","Psychology","Social Sciences"]
+}}
+};
+
+/* =========================================================
+   RENDER LOGIC
+   ========================================================= */
+const yearSelect = document.getElementById('yearSelect');
+const semesterSelect = document.getElementById('semesterSelect');
+const years = Object.keys(DATA); // insertion order: newest first
+years.forEach(y => {
+  const opt = document.createElement('option');
+  opt.value = y; opt.textContent = y;
+  yearSelect.appendChild(opt);
+});
+
+let charts = {};
+function destroyCharts(){ Object.values(charts).forEach(c => c && c.destroy()); charts = {}; }
+
+function fmt(n){ return n.toLocaleString(); }
+
+function render(){
+  const year = yearSelect.value;
+  const semester = semesterSelect.value;
+  const d = DATA[year] && DATA[year][semester];
+
+  document.getElementById('viewingLabel').textContent = `${semester} ${year}`;
+  if (!d){
+    document.getElementById('sourceLink').style.display = 'none';
+    return;
+  }
+  document.getElementById('sourceLink').style.display = 'inline';
+  document.getElementById('sourceLink').href = d.pdf;
+
+  // Hero
+  document.getElementById('censusLabel').textContent = d.census;
+  document.getElementById('heroTotal').textContent = fmt(d.headcount.total.n);
+  document.getElementById('heroUG').textContent = fmt(d.headcount.ug.n);
+  document.getElementById('heroGrad').textContent = fmt(d.headcount.grad.n);
+  document.getElementById('heroGender').textContent = `${d.headcount.total.m}% / ${d.headcount.total.f}%`;
+
+  // KPI grid
+  const kpiGrid = document.getElementById('kpiGrid');
+  kpiGrid.innerHTML = `
+    <div class="kpi"><div class="kpi-val">${d.kpis.retention.pct}%</div><div class="kpi-label">Retention rate</div><div class="kpi-note">${d.kpis.retention.span}</div></div>
+    <div class="kpi"><div class="kpi-val">${d.kpis.gradRate.pct}%</div><div class="kpi-label">Graduation rate, 6-yr</div><div class="kpi-note">${d.kpis.gradRate.cohort}${d.kpis.gradRate.source ? ' · ' + d.kpis.gradRate.source : ''}</div></div>
+    <div class="kpi"><div class="kpi-val">${d.kpis.ratio}</div><div class="kpi-label">Student : faculty ratio</div><div class="kpi-note">All students, all faculty</div></div>
+    <div class="kpi"><div class="kpi-val">${d.kpis.tenureTrack.pct}%</div><div class="kpi-label">Tenured / tenure-track</div><div class="kpi-note">${d.kpis.tenureTrack.source}</div></div>
+  `;
+
+  // Extra strip (Pell / First-Gen, only some periods)
+  const extraStrip = document.getElementById('extraStrip');
+  if (d.extra){
+    extraStrip.innerHTML = `
+      <div class="kpi"><div class="kpi-val">${d.extra.pell}</div><div class="kpi-label">Pell Grant recipients</div><div class="kpi-note">First-time, full-time UG · IPEDS FinAid AY24-25</div></div>
+      <div class="kpi"><div class="kpi-val">${d.extra.firstGen}</div><div class="kpi-label">First-generation students</div><div class="kpi-note">Degree-seeking undergraduates</div></div>
+    `;
+  } else {
+    extraStrip.innerHTML = '';
+  }
+
+  // Enrollment table
+  const eb = document.getElementById('enrollmentBody');
+  const rowsE = [['Undergraduate', d.headcount.ug], ['Graduate', d.headcount.grad]];
+  eb.innerHTML = rowsE.map(([label, r]) => `
+    <tr><td>${label}</td><td class="num">${fmt(r.n)}</td><td class="num">${r.m}%</td><td class="num">${r.f}%</td><td class="num">${r.ft}%</td><td class="num">${r.pt}%</td><td class="num">${r.min}%</td><td class="num">${r.ctres}%</td></tr>
+  `).join('') + `
+    <tr class="total-row"><td>Total</td><td class="num">${fmt(d.headcount.total.n)}</td><td class="num">${d.headcount.total.m}%</td><td class="num">${d.headcount.total.f}%</td><td class="num">${d.headcount.total.ft}%</td><td class="num">${d.headcount.total.pt}%</td><td class="num">${d.headcount.total.min}%</td><td class="num">${d.headcount.total.ctres}%</td></tr>
+  `;
+
+  // Race/Ethnicity table + chart
+  const raceSorted = [...d.race].sort((a,b) => b[3]-a[3]);
+  const rb = document.getElementById('raceBody');
+  rb.innerHTML = raceSorted.map(([label,ug,grad,total]) => `
+    <tr><td>${label}</td><td class="num">${fmt(ug)}</td><td class="num">${fmt(grad)}</td><td class="num">${fmt(total)}</td></tr>
+  `).join('') + `
+    <tr class="total-row"><td>Total</td><td class="num">${fmt(d.raceTotal[0])}</td><td class="num">${fmt(d.raceTotal[1])}</td><td class="num">${fmt(d.raceTotal[2])}</td></tr>
+  `;
+
+  const navy = '#12294b', navyMid = '#274a7a', goldBright = '#c99a2e', brick = '#8a3a2c', stone = '#9aa3ac';
+
+  charts.race = new Chart(document.getElementById('raceChart'), {
+    type: 'bar',
+    data: { labels: raceSorted.map(r=>r[0]), datasets: [{ label:'Total', data: raceSorted.map(r=>r[3]), backgroundColor: navy, borderRadius:2, maxBarThickness:18 }] },
+    options: { indexAxis:'y', responsive:true, plugins:{ legend:{display:false} },
+      scales:{ x:{ grid:{color:'#e6e3da'}, ticks:{ callback: v => v.toLocaleString() } }, y:{ grid:{display:false} } } }
+  });
+
+  // Minority trend
+  document.getElementById('minorityChartTitle').textContent = `Minority percentage — ${d.minorityTrend.labelA} vs ${d.minorityTrend.labelB}`;
+  charts.minority = new Chart(document.getElementById('minorityChart'), {
+    type: 'bar',
+    data: { labels:[d.minorityTrend.labelA, d.minorityTrend.labelB], datasets:[{ data:[d.minorityTrend.pctA, d.minorityTrend.pctB], backgroundColor:[stone, goldBright], borderRadius:3, maxBarThickness:90 }] },
+    options: { responsive:true, plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: ctx => ctx.parsed.y + '%' } } },
+      scales:{ y:{ beginAtZero:true, max:60, ticks:{ callback: v => v + '%' }, grid:{color:'#e6e3da'} }, x:{ grid:{display:false} } } }
+  });
+  document.getElementById('minorityNote').innerHTML = `In <strong>${d.minorityTrend.labelA}</strong>, minority students made up <strong>${d.minorityTrend.pctA}%</strong> of Central's total headcount. By <strong>${d.minorityTrend.labelB}</strong>, that figure had reached <strong>${d.minorityTrend.pctB}%</strong> — a gain of ${d.minorityTrend.pctB - d.minorityTrend.pctA} percentage points.`;
+
+  // Cost of attendance
+  document.getElementById('costNote').textContent = `Full-time annual tuition & fees and part-time per-credit rates, ${d.cost.span}.`;
+  document.getElementById('costFullTime').innerHTML = d.cost.fullTime.map(([l,a]) => `<li><span>${l}</span><span class="amt">${a}</span></li>`).join('');
+  document.getElementById('costPartTime').innerHTML = d.cost.partTime.map(([l,a]) => `<li><span>${l}</span><span class="amt">${a}</span></li>`).join('');
+  document.getElementById('costPartTimeHeader').textContent = d.cost.format === 'new' ? 'Part-Time, In-State — Per Credit Hour' : 'Part-Time — Per Credit Hour';
+
+  // Degrees awarded
+  document.getElementById('degreesNote').textContent = `${d.degrees.span}, by school and credential level.`;
+  const headRow = document.getElementById('degreesHeadRow');
+  headRow.innerHTML = `<th>Credential</th>` + d.degrees.schools.map(s => `<th class="num">${s}</th>`).join('') + `<th class="num">Total</th>`;
+  const db = document.getElementById('degreesBody');
+  db.innerHTML = d.degrees.rows.map(([cred, vals, total]) => `
+    <tr><td>${cred}</td>${vals.map(v => `<td class="num">${fmt(v)}</td>`).join('')}<td class="num">${fmt(total)}</td></tr>
+  `).join('') + `
+    <tr class="total-row"><td>Total</td>${d.degrees.total.map(v => `<td class="num">${fmt(v)}</td>`).join('')}<td class="num">${fmt(d.degrees.totalAll)}</td></tr>
+  `;
+
+  const credColors = { "Bachelor's": navy, "Master's": navyMid, "Post-Bac. Cert.": goldBright, "Post-Master's Cert.": goldBright, "Doctoral": brick, "Post-Secondary": stone };
+  const usedCerts = {};
+  const datasets = d.degrees.rows.map(([cred, vals]) => {
+    let color = credColors[cred];
+    if (!color) color = stone;
+    return { label: cred, data: vals, backgroundColor: color };
+  });
+  charts.degrees = new Chart(document.getElementById('degreesChart'), {
+    type: 'bar',
+    data: { labels: d.degrees.schools, datasets },
+    options: { responsive:true, plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, padding:12, font:{size:10} } } },
+      scales:{ x:{ stacked:true, grid:{display:false}, ticks:{ font:{size:9} } }, y:{ stacked:true, grid:{color:'#e6e3da'} } } }
+  });
+
+  // Faculty
+  document.getElementById('facultyChartTitle').textContent = `Faculty composition — ${fmt(d.faculty.total)} total`;
+  document.getElementById('facultyNote').textContent = `${d.faculty.label}; most popular undergraduate majors.`;
+  charts.faculty = new Chart(document.getElementById('facultyChart'), {
+    type: 'doughnut',
+    data: { labels:[`Full-Time (${d.faculty.ft})`, `Part-Time (${d.faculty.pt})`], datasets:[{ data:[d.faculty.ft, d.faculty.pt], backgroundColor:[navy, goldBright], borderColor:'#fbfaf7', borderWidth:3 }] },
+    options: { responsive:true, cutout:'62%', plugins:{ legend:{ position:'bottom', labels:{ boxWidth:10, boxHeight:10, padding:14 } } } }
+  });
+
+  // Popular programs
+  document.getElementById('popularList').innerHTML = d.popularPrograms.map(p => `<li><span>${p}</span></li>`).join('');
+}
+
+function update(){
+  destroyCharts();
+  render();
+}
+
+yearSelect.addEventListener('change', update);
+semesterSelect.addEventListener('change', update);
+
+// Default landing: Spring 2025-26
+yearSelect.value = "2025-26";
+semesterSelect.value = "Spring";
+update();
+</script>
+
+</body>
+</html>
