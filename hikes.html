@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hikes in Connecticut and Beyond — Daniel A. Long, Ph.D.</title>
+<meta name="description" content="Hikes in Connecticut, Scotland, and Argentina.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1B2A4A;
+    --parchment:#F7F5ED;
+    --brass:#A87C3F;
+    --slate:#5B6472;
+    --teal:#2F6F6B;
+    --line:#D8D2C4;
+    --white:#FFFFFF;
+    --max:1080px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--parchment);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Lora',serif;color:var(--ink);margin:0;}
+  a{color:var(--teal);}
+  a:focus-visible, button:focus-visible{outline:2px solid var(--brass);outline-offset:3px;}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 32px;}
+
+  /* ---------- Header / Nav (matches landing page) ---------- */
+  header{
+    position:sticky;top:0;z-index:20;
+    background:rgba(247,245,237,0.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.wrap{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 32px;gap:12px 28px;flex-wrap:wrap;
+  }
+  .nav-name{font-family:'Lora',serif;font-weight:600;font-size:18px;color:var(--ink);text-decoration:none;}
+  .nav-links{display:flex;gap:28px;flex-wrap:wrap;list-style:none;margin:0;padding:0;}
+  .nav-links a{
+    text-decoration:none;color:var(--ink);font-size:14px;font-weight:500;
+    border-bottom:1px solid transparent;
+  }
+  .nav-links a:hover{border-bottom:1px solid var(--brass);}
+  .nav-toggle{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);-webkit-tap-highlight-color:transparent}
+
+  /* ---------- Page ---------- */
+  .page{padding:56px 0 96px;}
+  .back{font-size:14px;font-weight:600;text-decoration:none;display:inline-block;margin-bottom:28px;}
+  .back:hover{text-decoration:underline;}
+  .page h1{font-size:clamp(30px,4vw,44px);font-weight:600;line-height:1.15;}
+
+  .table-scroll{margin-top:36px;overflow-x:auto;}
+  table.hikes{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--white);
+    border:1px solid var(--line);
+    font-size:16px;
+  }
+  .hikes th, .hikes td{
+    text-align:left;
+    padding:16px 22px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+  }
+  .hikes thead th{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--brass);
+    background:var(--parchment);
+    border-bottom:1px solid var(--ink);
+  }
+  .hikes tbody th{font-weight:600;color:var(--ink);}
+  .hikes tbody td{color:var(--slate);}
+  .hikes tbody tr:last-child th,
+  .hikes tbody tr:last-child td{border-bottom:none;}
+  .hikes td a{font-weight:600;}
+
+  /* ---------- Footer ---------- */
+  footer{padding:40px 0;border-top:1px solid var(--line);}
+  .footer-links{display:flex;gap:22px;flex-wrap:wrap;}
+  .footer-links a{font-size:14px;font-weight:600;text-decoration:none;}
+
+  @media (max-width:760px){
+    .wrap{padding:0 20px;}
+    nav.wrap{padding:8px 20px;}
+    .nav-name{font-size:17px;order:1;}
+    .nav-toggle{order:2;display:block;font-size:24px;line-height:1;min-width:44px;min-height:44px;padding:0;}
+    .nav-links{order:3;display:none;flex-direction:column;gap:0;width:100%;padding:4px 0 10px;}
+    header.menu-open .nav-links{display:flex;}
+    .nav-links li{border-top:1px solid var(--line);}
+    .nav-links a{display:block;padding:13px 0;font-size:16px;border-bottom:none;}
+    .nav-links a:hover, .nav-links a[aria-current="page"]{border-bottom:none;}
+    .nav-links a:hover{color:var(--brass);}
+    .page{padding:40px 0 72px;}
+    .hikes th, .hikes td{padding:14px 14px;font-size:15px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="wrap" aria-label="Main">
+    <a class="nav-name" href="index.html">Daniel A. Long, Ph.D.</a>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="bio.html">Bio</a></li>
+      <li><a href="index.html#featured">Featured Work</a></li>
+      <li><a href="index.html#more">More Projects</a></li>
+      <li><a href="index.html#cv">CV &amp; Publications</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">☰</button>
+  </nav>
+</header>
+
+<main class="page">
+  <div class="wrap">
+    <a class="back" href="bio.html">&larr; Back to biography</a>
+    <h1>Hikes in Connecticut and Beyond</h1>
+
+    <div class="table-scroll">
+      <table class="hikes">
+        <thead>
+          <tr>
+            <th scope="col">Location</th>
+            <th scope="col">Date</th>
+            <th scope="col">Hikes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">Connecticut</th>
+            <td>in planning stage</td>
+            <td><a href="CT_Parks_Trip_10Day_Summary.html">20 historical hikes</a></td>
+          </tr>
+          <tr>
+            <th scope="row">Scotland</th>
+            <td>July 2025</td>
+            <td>Conic Hill</td>
+          </tr>
+          <tr>
+            <th scope="row">Argentina</th>
+            <td>August 2023</td>
+            <td>Iguazu</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-links">
+      <a href="mailto:drdaniellong@gmail.com">Email</a>
+      <a href="https://www.linkedin.com/in/drdaniellong/">LinkedIn</a>
+      <a href="https://github.com/drdaniellong">GitHub</a>
+      <a href="https://scholar.google.com/citations?user=t2IWGkIAAAAJ&amp;hl=en">Google Scholar</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var header = document.querySelector('header');
+  var btn = header.querySelector('.nav-toggle');
+  var links = header.querySelector('.nav-links');
+  function setOpen(open) {
+    header.classList.toggle('menu-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    btn.textContent = open ? '\u2715' : '\u2630';
+  }
+  btn.addEventListener('click', function () {
+    setOpen(!header.classList.contains('menu-open'));
+  });
+  links.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 760) setOpen(false);
+  });
+})();
+</script>
+
+</body>
+</html>

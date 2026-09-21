@@ -81,10 +81,10 @@
     border-bottom:1px solid transparent;
   }
   .nav-links a:hover{border-bottom:1px solid var(--brass);}
-  .nav-toggle{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);}
+  .nav-toggle{display:none;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink);-webkit-tap-highlight-color:transparent}
 
   /* ---------- Hero ---------- */
-  .hero{padding:64px 0 88px;}
+  .hero{padding:64px 32px 88px;}
   .hero .eyebrow{
     font-family:'IBM Plex Mono',monospace;
     font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
@@ -183,6 +183,8 @@
   .grid-card p{color:var(--slate);font-size:14px;margin:0 0 14px;}
   .grid-card a{font-size:13px;font-weight:600;text-decoration:none;display:block;margin-top:4px;}
   .grid-card a::after{content:" →";}
+  .grid-card p a{display:inline;margin-top:0;font-size:inherit;}
+  .grid-card p a::after{content:none;}
 
   /* ---------- CV / Publications ---------- */
   .cv-block{
@@ -210,12 +212,58 @@
   }
 
   @media (max-width:760px){
-    .nav-links{display:none;}
-    .nav-toggle{display:block;}
-    .about-grid{grid-template-columns:1fr;}
-    .featured-item{grid-template-columns:1fr;gap:8px;}
+    .wrap{padding:0 20px;}
+
+    /* Working phone menu */
+    nav.wrap{flex-wrap:wrap;padding:8px 20px;}
+    .nav-name{font-size:17px;order:1;}
+    .nav-toggle{order:2;
+      display:block;font-size:24px;line-height:1;
+      min-width:44px;min-height:44px;padding:0;
+    }
+    .nav-links{
+      order:3;display:none;flex-direction:column;gap:0;width:100%;
+      padding:4px 0 10px;
+    }
+    header.menu-open .nav-links{display:flex;}
+    .nav-links li{border-top:1px solid var(--line);}
+    .nav-links a{display:block;padding:13px 0;font-size:16px;border-bottom:none;}
+    .nav-links a:hover{border-bottom:none;color:var(--brass);}
+
+    /* Term ribbon: shrink so it fits the screen */
+    .term-ribbon{font-size:10px;letter-spacing:0.02em;padding-top:20px;overflow:hidden;}
+    .term-ribbon .label{padding:0 6px;}
+    .term-ribbon .tick{min-width:4px;}
+
+    .hero{padding:36px 20px 56px;}
+    .hero .role{font-size:17px;}
+    .hero .cta-row .btn{flex:1 1 auto;justify-content:center;}
+    .funnel{margin-top:40px;}
+    .funnel-label{font-size:9px;letter-spacing:0;}
+
+    section{padding:48px 0;}
+    .section-head{margin-bottom:28px;}
+    .section-head h2{font-size:26px;}
+
+    .about-grid{grid-template-columns:1fr;gap:32px;}
+    .about-facts li{flex-direction:column;gap:2px;}
+
+    .featured-item{grid-template-columns:1fr;gap:8px;padding:28px 0;}
+    .featured-links a{display:inline-block;padding:6px 0;}
+
     .grid-4{grid-template-columns:1fr;}
-    .funnel-label{font-size:9px;}
+    .grid-card{padding:22px;}
+
+    .cv-block{padding:22px;}
+    .cv-block .btn{width:100%;justify-content:center;}
+
+    footer h2{font-size:24px;}
+    .footer-links{gap:12px 22px;}
+  }
+
+  @media (max-width:380px){
+    .term-ribbon{font-size:9px;}
+    .term-ribbon .label{padding:0 5px;}
   }
 
   @media (prefers-reduced-motion: reduce){
@@ -229,14 +277,15 @@
 <header>
   <nav class="wrap">
     <span class="nav-name">Daniel A. Long, Ph.D.</span>
-    <ul class="nav-links">
+    <ul class="nav-links" id="nav-links">
       <li><a href="#about">About</a></li>
+      <li><a href="bio.html">Bio</a></li>
       <li><a href="#featured">Featured Work</a></li>
       <li><a href="#more">More Projects</a></li>
       <li><a href="#cv">CV &amp; Publications</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
-    <button class="nav-toggle" aria-label="Menu">☰</button>
+    <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">☰</button>
   </nav>
 </header>
 
@@ -522,6 +571,32 @@
     </p>
   </div>
 </footer>
+
+<script>
+(function () {
+  var header = document.querySelector('header');
+  var btn = header.querySelector('.nav-toggle');
+  var links = header.querySelector('.nav-links');
+  function setOpen(open) {
+    header.classList.toggle('menu-open', open);
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    btn.textContent = open ? '\u2715' : '\u2630';
+  }
+  btn.addEventListener('click', function () {
+    setOpen(!header.classList.contains('menu-open'));
+  });
+  links.addEventListener('click', function (e) {
+    if (e.target.closest('a')) setOpen(false);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') setOpen(false);
+  });
+  window.addEventListener('resize', function () {
+    if (window.innerWidth > 760) setOpen(false);
+  });
+})();
+</script>
 
 </body>
 </html>
